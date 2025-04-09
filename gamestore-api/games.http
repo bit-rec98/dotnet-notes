@@ -11,10 +11,10 @@ POST http://localhost:5075/games
 Content-Type: application/json
 
 {
-    "name": "Super Mario Bros",
-    "genre": "Platformer",
-    "price": 30.99,
-    "releaseDate": "1985-09-13"
+    "name": "Dying Light",
+    "genreId": 2,
+    "price": 21.99,
+    "releaseDate": "2015-01-27"
 }
 
 ###

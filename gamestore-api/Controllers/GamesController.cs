@@ -1,4 +1,6 @@
+using gamestore_api.Data;
 using gamestore_api.DTO;
+using gamestore_api.Entities;
 
 namespace gamestore_api.Controllers;
 
@@ -63,19 +65,39 @@ public static class GamesController
         .WithName(GetGameEndpointName); // Se le asigna un nombre a la ruta para poder referenciarla en otros lugares
 
         // Petición POST para crear un juego
-        app.MapPost("games", (CreateGameDto newGame) =>
+        // Al inyectar el contexto de la base de datos en el endpoint, ASP.NET Core se va a encargar de crear una nueva instancia del contexto de la base de datos para cada solicitud, lo que garantiza que cada solicitud tenga su propia instancia del contexto y evita problemas de concurrencia y rendimiento.
+        app.MapPost("games", (CreateGameDto newGame, GameStoreContext dbContext) =>
             {
+                // Creación de un nuevo juego con los datos recibidos en el payload del body
+                Game game = new()
+                {
+                    Name = newGame.Name,
+                    Genre = dbContext.Genres.Find(newGame.GenreId), // Se busca el género del juego en la base de datos a través de su ID
+                    GenreId = newGame.GenreId,
+                    Price = newGame.Price,
+                    ReleaseDate = newGame.ReleaseDate
+                };
 
-                
-                GameDto game = new(
-                    games.Count + 1,
-                    newGame.Name,
-                    newGame.Genre,
-                    newGame.Price,
-                    newGame.ReleaseDate
-                ); // Se crea un nuevo juego con los datos recibidos en el payload del body
+                // Creación manual de los DTOs - Ya no es necesario al implementar la creación de entidades con el contexto de la base de datos
+                // ----
+                // GameDto game = new(
+                //     games.Count + 1,
+                //     newGame.Name,
+                //     newGame.Genre,
+                //     newGame.Price,
+                //     newGame.ReleaseDate
+                // ); 
+                // ----
+                // Se crea un nuevo juego con los datos recibidos en el payload del body
 
-                games.Add(game); // Se añade el nuevo juego a la lista de juegos
+                // Se añade el nuevo juego a la lista de juegos
+                // games.Add(game);
+
+                // Se añade la nueva entidad al contexto de la base de datos
+                dbContext.Games.Add(game); // Se puede omitir el DbSet escribiendo dbContext.Add(game) pero es recomendable usar el DbSet para mantener la claridad del código y seguir las mejores prácticas de programación.
+
+                // Se guardan los cambios en la base de datos (se transforman los cambios en el contexto para transformarlos a queries SQL y enviarlos a la base de datos)
+                dbContext.SaveChanges();
 
                 return Results.CreatedAtRoute(GetGameEndpointName, new { id = game.Id }, game); // Se retorna un código 201 Created y la ruta de la nueva entidad creada junto con el payload de la entidad creada
             }
@@ -169,19 +191,49 @@ public static class GamesController
         .WithName(GetGameEndpointName); // Se le asigna un nombre a la ruta para poder referenciarla en otros lugares
 
         // Petición POST para crear un juego
-        group.MapPost("/", (CreateGameDto newGame) =>
+        group.MapPost("/", (CreateGameDto newGame, GameStoreContext dbContext) =>
             {
-                GameDto game = new(
-                    games.Count + 1,
-                    newGame.Name,
-                    newGame.Genre,
-                    newGame.Price,
-                    newGame.ReleaseDate
-                ); // Se crea un nuevo juego con los datos recibidos en el payload del body
+                // Creación de un nuevo juego con los datos recibidos en el payload del body
+                Game game = new()
+                {
+                    Name = newGame.Name,
+                    Genre = dbContext.Genres.Find(newGame.GenreId), // Se busca el género del juego en la base de datos a través de su ID
+                    GenreId = newGame.GenreId,
+                    Price = newGame.Price,
+                    ReleaseDate = newGame.ReleaseDate
+                };
 
-                games.Add(game); // Se añade el nuevo juego a la lista de juegos
+                // Creación manual de los DTOs - Ya no es necesario al implementar la creación de entidades con el contexto de la base de datos
+                // ----
+                // GameDto game = new(
+                //     games.Count + 1,
+                //     newGame.Name,
+                //     newGame.Genre,
+                //     newGame.Price,
+                //     newGame.ReleaseDate
+                // ); 
+                // ----
+                // Se crea un nuevo juego con los datos recibidos en el payload del body
 
-                return Results.CreatedAtRoute(GetGameEndpointName, new { id = game.Id }, game); // Se retorna un código 201 Created y la ruta de la nueva entidad creada junto con el payload de la entidad creada
+                // Se añade el nuevo juego a la lista de juegos
+                // games.Add(game);
+
+                // Se añade la nueva entidad al contexto de la base de datos
+                dbContext.Games.Add(game); // Se puede omitir el DbSet escribiendo dbContext.Add(game) pero es recomendable usar el DbSet para mantener la claridad del código y seguir las mejores prácticas de programación.
+
+                // Se guardan los cambios en la base de datos (se transforman los cambios en el contexto para transformarlos a queries SQL y enviarlos a la base de datos)
+                dbContext.SaveChanges();
+
+                // Creación de un nuevo DTO con los datos del juego creado, se debe crear para evitar devolver la entidad interna al cliente
+                GameDto gameDto = new(
+                    game.Id,
+                    game.Name,
+                    game.Genre!.Name,
+                    game.Price,
+                    game.ReleaseDate
+                ); 
+
+                return Results.CreatedAtRoute(GetGameEndpointName, new { id = game.Id }, gameDto); // Se retorna un código 201 Created y la ruta de la nueva entidad creada junto con el payload de la entidad creada
             }
         )
         .WithParameterValidation(); // Se habilita la validación de los parámetros de la petición mediante Data Annotations en el DTO, esto se logra mediante el paquete MinimalApis.Extensions que se instala en el proyecto a través de NuGet
