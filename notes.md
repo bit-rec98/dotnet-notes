@@ -204,6 +204,18 @@ dotnet ef migrations remove
     1.2. Cuando una nueva petición HTTP se detecta, el contenedor de dependencias va a construir e inyectar una nueva instancia de MyLogger, la cual no tendrá nada que ver con la instancia ya creada.
     1.3. Si existe otro servicio que participa en cualquiera de estas peticiones HTTP y tiene una dependencia de MyLogger, también va a recibir una nueva instancia de MyLogger, la cual no tendrá relación con las demás instancias ya creadas. 
     1.4. Los ciclos de vida transientes de los servicios se crean cada vez que estos servicios son solicitados desde el contenedor de dependencias (IServiceProvider (o contenedor de servicios)).
-    2. **Ciclo de vida encapsulado (scoped)**: 
-
-CONTINUAR EN 2:34:00
+    ![transient_lifetime_diagram](docs/transient.png)
+    2. **Ciclo de vida encapsulado (scoped)**: Ocurre en un escenario en el cual una clase (MyLogger en este ejemplo) mantiene cierto estado que se necesita compartir a través de diferentes clases que participan en una petición HTTP.
+    2.1. La clase (MyLogger) cuyo estado se debe compartir se registra en el contenedor de dependencias (IServiceProvider) mediante el método **.AddScoped<MyLogger>()**. 
+    2.2. En este caso, cuando una petición HTTP sea detectada, el contenedor de dependencias se va a encargar de resolver, construir e inyectar una nueva instancia de la dependencia en el servicio.
+    2.3. Si hubiere otro servicio que también participa en la misma petición HTTP y que también tiene dependencia en la clase que se resuelve, construye e inyecta (MyLogger) en el primer servicio mencionado, este también va a recibir exactamente la misma instancia de la dependencia que recibió el primer servicio.
+    2.4. En el caso de que una nueva petición HTTP se detecte en el segundo servicio mencionado, el contenedor de dependencias va a crear e inyectar una nueva instancia en él, la cual va a ser diferente y no va a estar relacionada con la primera instancia correspondiente a la primera petición HTTP.
+    2.5. Los ciclos de vida encapsulados (scoped) para los servicios son creados de a una vez por cada petición HTTP detectada y se reutilizan dentro de esa misma petición.
+    ![scoped_lifetime_diagram](docs/scoped.png)
+    3. **Ciclo de vida Singleton**: sucede cuando una determinada clase (dependencia) es un tanto pesada y tiene determinado estado que se debe compartir con todas las clases que la solicitaron durante todo el ciclo de vida de la aplicación. 
+    3.1. Se debe registrar la dependencia en el contenedor con el método **.AddSingleton<MyLogger>()**.
+    3.2. Cuando una petición HTTP es detectada, el contenedor de dependencias (IServiceProvider) se encargará de resolver, construir e inyectar una nueva instancia de esta dependencia en la instancia del servicio. 
+    3.3. Si existe otro servicio que participa de la misma petición HTTP y también tiene dependencia con la clase (MyLogger), este servicio también va a recibir la misma instancia de la dependencia. 
+    3.4. Si una nueva petición HTTP es detectada, el contenedor de dependencias va a encargarse de proveer nuevamente la misma instancia de la dependencia (MyLogger) a cualquiera de las clases (servicios) que la necesiten durante la ejecución de la aplicación.
+    4. Los ciclos de vida singleton se crean la primera vez que se solicitan y se reutilizan durante el ciclo de vida de la ejecución de la aplicación. 
+    ![singleton_lifetime_diagram](docs/singleton.png)
