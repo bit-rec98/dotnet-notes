@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk.Web"> <!--* Definición de tipo de proyecto, permite importar las librerías de dependencias para solamente este tipo de proyecto -->
+
+  <!-- Grupo de propiedades que permite configurar diversos aspectos del proyecto (e.g. Dependencias, librerías externas necesarias) -->
+  <PropertyGroup> 
+    <TargetFramework>net9.0</TargetFramework> <!-- Permite acceder a todas las APIs disponibles en la versión declarada -->
+    <Nullable>enable</Nullable> <!--  -->
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>gamestore_api</RootNamespace>
+  </PropertyGroup>
+
+  <!-- Al instalar paquetes desde NuGet, las referencias a esos paquetes descargados se van a definir acá. -->
+  <!-- 
+    Ejemplo con paquete MinimalApis.Extensions en CLI: 
+    dotnet add package MinimalApis.Extensions (doubleGuionMedio)version 0.11.0
+   -->
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.3">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.3" />
+    <PackageReference Include="MinimalApis.Extensions" Version="0.11.0" />
+  </ItemGroup>
+
+</Project>
