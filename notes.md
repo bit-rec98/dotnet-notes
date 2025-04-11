@@ -219,3 +219,13 @@ dotnet ef migrations remove
     3.4. Si una nueva petición HTTP es detectada, el contenedor de dependencias va a encargarse de proveer nuevamente la misma instancia de la dependencia (MyLogger) a cualquiera de las clases (servicios) que la necesiten durante la ejecución de la aplicación.
     4. Los ciclos de vida singleton se crean la primera vez que se solicitan y se reutilizan durante el ciclo de vida de la ejecución de la aplicación. 
     ![singleton_lifetime_diagram](docs/singleton.png)
+
+# Ejecutando tareas asíncronas y sus beneficios
+![asynchronous_flow_diagram](docs/asynchronous_flow_diagram.png)
+- Mejor rendimiento: Se evitan bloqueantes en las llamadas, lo cual permite realizar varias peticiones para lograr una mejor calidad en la responsividad.
+- Mejor escalabilidad: Se logra que la aplicación maneje más peticiones y usuarios simultáneamente sin dejar que la aplicación se bloquee por esperar peticiones de operaciones para completar.
+- Código más simplificado: El código asíncrono es simple de escribir mediante objetos **Task** y las keywords **async-await**. Lo cual logra generar una manera simple e intuitiva de escribir código asíncrono, lo cual no ocurre al momento de trabajar con hilos y callbacks.
+- Para crear operaciones asíncronas, se usan las keywords **async** (para determinar la naturaleza del método a ejecutar en el endpoint), **await** (para determinar si la interacción con el contexto de la base de datos va a implicar una espera de los resultados) y los métodos predefinidos con el sufijo **Async** (e.g. .ToListAsync()) para realizar las operaciones asíncronas en el contexto de la base de datos.
+
+# Cómo consumir la API desde el cliente (con blazor)
+- Se debe añadir la dirección de la API en el archivo appsettings.json ubicado en el cliente.
