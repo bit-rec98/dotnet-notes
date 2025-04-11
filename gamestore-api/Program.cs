@@ -36,7 +36,17 @@ var app = builder.Build(); // Creación de la instancia de WebApplication y ejec
 // Se configuran los endpoints para procesar diferentes operaciones sobre todos los juegos
 app.MapGamesEndpointsWithRouteGroupBuilder();
 
+// Se configuran los endpoints para procesar diferentes operaciones sobre los géneros de videojuegos
+app.MapGenresEndpoints();
+
 // Se configuran los endpoints para procesar diferentes operaciones sobre un juego específico
-app.MigrateDb(); // Aplicación de migraciones pendientes a la base de datos al inicio de la aplicación
+// Aplicación de migraciones pendientes a la base de datos al inicio de la aplicación
+// app.MigrateDbAsync();
+
+// Se aplica la migración de la base de datos de manera asíncrona al inicio de la aplicación
+// Esto asegura que la base de datos esté actualizada y lista para su uso antes de que la aplicación comience a procesar solicitudes
+// Esto es útil para garantizar que la base de datos esté en un estado válido antes de que la aplicación comience a recibir solicitudes de los usuarios
+// Esto es especialmente útil en aplicaciones que utilizan migraciones de base de datos para actualizar el esquema de la base de datos a medida que la aplicación evoluciona y se realizan cambios en el modelo de datos
+await app.MigrateDbAsync();
 
 app.Run(); // Ejecución del host 

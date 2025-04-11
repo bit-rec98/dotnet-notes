@@ -3,7 +3,7 @@ GET http://localhost:5075/games
 
 ### 
 
-GET http://localhost:5075/games/6
+GET http://localhost:5075/games/5
 
 ### 
 
@@ -13,7 +13,7 @@ Content-Type: application/json
 {
     "name": "Dying Light",
     "genreId": 2,
-    "price": 21.99,
+    "price": 24.99,
     "releaseDate": "2015-01-27"
 }
 
@@ -23,12 +23,12 @@ PUT http://localhost:5075/games/1
 Content-Type: application/json
 
 {
-    "name": "Call of Duty II",
-    "genre": "FPS/Shooter",
-    "price": 32.99,
-    "releaseDate": "2000-02-25"
+    "name": "Dying Light II",
+    "genreId": 2,
+    "price": 39.99,
+    "releaseDate": "2022-02-04"
 }
 
 ### 
 
-DELETE http://localhost:5075/games/5
+DELETE http://localhost:5075/games/1

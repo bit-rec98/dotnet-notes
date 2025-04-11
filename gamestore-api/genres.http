@@ -1,0 +1,2 @@
+# Este archivo .http permite hacer peticiones HTTP a la API
+GET http://localhost:5075/genres
